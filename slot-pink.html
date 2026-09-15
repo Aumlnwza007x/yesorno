@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="theme-color" content="#F6A9C4">
+<title>slot</title>
+<style>
+  :root{
+    --bg:#F6A9C4;
+    --bg-2:#FBC9DC;
+    --shell:#FFF1F5;
+    --shell-dark:#F3D3DF;
+    --window:#FFFFFF;
+    --btn:#D8477E;
+    --btn-dark:#A82F5D;
+    --glow:#8E2653;
+  }
+  *{box-sizing:border-box;-webkit-tap-highlight-color:transparent;-webkit-touch-callout:none}
+  html{
+    height:100%;
+    overscroll-behavior:none;
+    touch-action:pan-y;
+  }
+  body{
+    margin:0;padding:0;
+    min-height:100%;
+    min-height:100dvh;
+    background:var(--bg);
+    background-image:radial-gradient(120% 75% at 50% 0%, var(--bg-2) 0%, var(--bg) 62%);
+    font-family:system-ui,-apple-system,sans-serif;
+    padding:max(22px, env(safe-area-inset-top)) max(16px, env(safe-area-inset-right)) max(22px, env(safe-area-inset-bottom)) max(16px, env(safe-area-inset-left));
+    max-width:460px;margin:0 auto;
+    display:flex;flex-direction:column;justify-content:center;gap:26px;
+    overscroll-behavior:none;
+    -webkit-user-select:none;user-select:none;
+  }
+  .machine{
+    background:linear-gradient(180deg,var(--shell) 0%,var(--shell-dark) 100%);
+    border-radius:22px;padding:15px;
+    box-shadow:0 9px 0 #D9A9BC, 0 20px 36px rgba(120,30,65,.3);
+  }
+  .reels{display:grid;grid-template-columns:repeat(3,1fr);gap:9px}
+  .reel{
+    position:relative;background:var(--window);border-radius:13px;
+    aspect-ratio:3/4;display:flex;align-items:center;justify-content:center;
+    box-shadow:inset 0 3px 10px rgba(140,50,80,.18), inset 0 -2px 0 #fff;
+    overflow:hidden;
+  }
+  .reel svg{width:58%;height:58%;display:block}
+  .reel.spinning svg{opacity:.4}
+  .reel.settle{animation:drop .22s cubic-bezier(.3,1.6,.5,1)}
+  @keyframes drop{0%{transform:translateY(-16%)}100%{transform:translateY(0)}}
+  .reels.jackpot .reel{
+    box-shadow:inset 0 0 0 3px var(--glow), inset 0 3px 10px rgba(140,50,80,.18);
+    animation:pulse .38s ease-in-out 2;
+  }
+  @keyframes pulse{50%{transform:scale(.95)}}
+
+  .lever{
+    align-self:center;
+    width:88px;height:88px;border:0;border-radius:50%;
+    background:var(--btn);cursor:pointer;
+    display:flex;align-items:center;justify-content:center;
+    box-shadow:0 6px 0 var(--btn-dark), 0 12px 22px rgba(120,30,65,.32);
+    transition:transform .08s,box-shadow .08s;
+    touch-action:manipulation;
+    -webkit-user-select:none;user-select:none;
+  }
+  .lever svg{width:38px;height:38px}
+  .lever:active{transform:translateY(5px);box-shadow:0 1px 0 var(--btn-dark)}
+  .lever:disabled{background:#E0B3C5;box-shadow:0 6px 0 #C296A8;cursor:default}
+  .lever:focus-visible{outline:3px solid var(--glow);outline-offset:4px}
+
+  .rules{
+    align-self:center;
+    display:flex;gap:10px;
+    -webkit-user-select:none;user-select:none;
+  }
+  .rules .card{
+    background:var(--shell);
+    border-radius:12px;
+    padding:8px 10px 7px;
+    min-width:52px;
+    text-align:center;
+    box-shadow:0 3px 0 var(--shell-dark);
+  }
+  .rules .card .icon{display:flex;justify-content:center;gap:2px;margin-bottom:4px}
+  .rules .card .icon svg{width:13px;height:13px}
+  .rules .card .val{font-family:system-ui,-apple-system,sans-serif;font-weight:700;font-size:.85rem;color:var(--btn-dark)}
+  @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+
+<div class="machine">
+  <div class="reels" id="reels"></div>
+</div>
+
+<button class="lever" id="lever" aria-label="spin">
+  <svg viewBox="0 0 48 48" fill="none" stroke="#FFF1F5" stroke-width="6" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M9 24a15 15 0 1 0 4.7-10.9"/><path d="M9 8v9h9"/>
+  </svg>
+</button>
+
+<div class="rules">
+  <div class="card">
+    <div class="icon">
+      <svg viewBox="0 0 48 48" fill="none" stroke="#2AA36B" stroke-width="8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 25l11 11L39 13"/></svg>
+    </div>
+    <div class="val">5</div>
+  </div>
+  <div class="card">
+    <div class="icon">
+      <svg viewBox="0 0 48 48" fill="none" stroke="#2AA36B" stroke-width="8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 25l11 11L39 13"/></svg>
+      <svg viewBox="0 0 48 48" fill="none" stroke="#2AA36B" stroke-width="8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 25l11 11L39 13"/></svg>
+    </div>
+    <div class="val">10</div>
+  </div>
+  <div class="card">
+    <div class="icon">
+      <svg viewBox="0 0 48 48" fill="none" stroke="#2AA36B" stroke-width="8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 25l11 11L39 13"/></svg>
+      <svg viewBox="0 0 48 48" fill="none" stroke="#2AA36B" stroke-width="8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 25l11 11L39 13"/></svg>
+      <svg viewBox="0 0 48 48" fill="none" stroke="#2AA36B" stroke-width="8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 25l11 11L39 13"/></svg>
+    </div>
+    <div class="val">20</div>
+  </div>
+  <div class="card">
+    <div class="icon">
+      <svg viewBox="0 0 48 48" fill="none" stroke="#E39A1F" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"><path d="M39 24a15 15 0 1 1-4.7-10.9"/><path d="M39 8v9h-9"/></svg>
+      <svg viewBox="0 0 48 48" fill="none" stroke="#E39A1F" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"><path d="M39 24a15 15 0 1 1-4.7-10.9"/><path d="M39 8v9h-9"/></svg>
+      <svg viewBox="0 0 48 48" fill="none" stroke="#E39A1F" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"><path d="M39 24a15 15 0 1 1-4.7-10.9"/><path d="M39 8v9h-9"/></svg>
+    </div>
+    <div class="val">↻</div>
+  </div>
+</div>
+
+<script>
+const SVGS = {
+  check:'<svg viewBox="0 0 48 48" fill="none" stroke="#2AA36B" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"><path d="M9 25l11 11L39 13"/></svg>',
+  cross:'<svg viewBox="0 0 48 48" fill="none" stroke="#E0452F" stroke-width="7" stroke-linecap="round"><path d="M12 12l24 24M36 12L12 36"/></svg>',
+  respin:'<svg viewBox="0 0 48 48" fill="none" stroke="#E39A1F" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"><path d="M39 24a15 15 0 1 1-4.7-10.9"/><path d="M39 8v9h-9"/></svg>'
+};
+const FACES = ['check','cross','respin'];
+const reelsEl = document.getElementById('reels');
+const lever = document.getElementById('lever');
+const reelEls = [];
+
+for (let i=0;i<3;i++){
+  const d = document.createElement('div');
+  d.className = 'reel';
+  d.innerHTML = SVGS.respin;
+  reelsEl.appendChild(d);
+  reelEls.push(d);
+}
+const paint = (i,f) => reelEls[i].innerHTML = SVGS[f];
+const rnd = () => FACES[Math.floor(Math.random()*3)];
+const sleep = ms => new Promise(r => setTimeout(r, ms));
+const current = ['respin','respin','respin'];
+
+let spinToken = 0;
+let activeTimers = [];
+function clearActiveTimers(){
+  activeTimers.forEach(clearInterval);
+  activeTimers = [];
+}
+
+async function spin(){
+  const myToken = ++spinToken;
+  lever.disabled = true;
+  reelsEl.classList.remove('jackpot');
+
+  activeTimers = reelEls.map((el,i) => {
+    el.classList.remove('settle');
+    el.classList.add('spinning');
+    return setInterval(() => paint(i, rnd()), 70);
+  });
+
+  for (let i=0;i<3;i++){
+    await sleep(i === 0 ? 560 : 260);
+    if (myToken !== spinToken) return;
+    clearInterval(activeTimers[i]);
+    current[i] = rnd();
+    paint(i, current[i]);
+    reelEls[i].classList.remove('spinning');
+    reelEls[i].classList.add('settle');
+  }
+  await sleep(200);
+  if (myToken !== spinToken) return;
+
+  if (current.every(f => f === 'respin')){
+    reelsEl.classList.add('jackpot');
+    await sleep(820);
+    if (myToken !== spinToken) return;
+    return spin();
+  }
+  lever.disabled = false;
+}
+
+/* กันแตะซ้ำ/หลายนิ้วพร้อมกัน และกันดับเบิลแท็บซูม */
+let usedTouch = false;
+let lastTap = 0;
+lever.addEventListener('touchend', e => {
+  e.preventDefault();
+  usedTouch = true;
+  const now = Date.now();
+  if (now - lastTap < 250) return;
+  lastTap = now;
+  if (!lever.disabled) spin();
+}, {passive:false});
+
+lever.addEventListener('click', () => {
+  if (usedTouch) return;
+  if (!lever.disabled) spin();
+});
+
+lever.addEventListener('contextmenu', e => e.preventDefault());
+
+/* เคลียร์ตัวจับเวลาเมื่อสลับแอปหรือพับหน้าจอ กันการหมุนค้าง */
+document.addEventListener('visibilitychange', () => {
+  if (document.hidden){
+    spinToken++;
+    clearActiveTimers();
+    lever.disabled = false;
+    reelsEl.classList.remove('jackpot');
+  }
+});
+
+/* กันการลากหน้าจอ/ซูมสองนิ้วภายในตู้ */
+document.addEventListener('gesturestart', e => e.preventDefault());
+document.addEventListener('dblclick', e => e.preventDefault());
+</script>
+</body>
+</html>
