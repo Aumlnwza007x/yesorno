@@ -75,6 +75,29 @@
   .lever:disabled{background:#E0B3C5;box-shadow:0 6px 0 #C296A8;cursor:default}
   .lever:focus-visible{outline:3px solid var(--glow);outline-offset:4px}
 
+  .fx-layer{
+    position:fixed;inset:0;
+    pointer-events:none;
+    overflow:hidden;
+    z-index:50;
+  }
+  .spark{
+    position:absolute;
+    bottom:-14px;
+    left:var(--x);
+    width:7px;height:7px;
+    border-radius:50%;
+    background:var(--c, #E0452F);
+    box-shadow:0 0 7px 1px var(--c, #E0452F);
+    opacity:0;
+    animation:rise var(--dur,1.1s) cubic-bezier(.15,.6,.25,1) forwards;
+  }
+  @keyframes rise{
+    0%{opacity:1;transform:translate(0,0) scale(1)}
+    68%{opacity:1;transform:translate(var(--dx,0), var(--rh,-58vh)) scale(1)}
+    100%{opacity:0;transform:translate(calc(var(--dx,0) + var(--bx,0)), calc(var(--rh,-58vh) + var(--bh,60px))) scale(.4)}
+  }
+
   .rules{
     align-self:stretch;
     display:flex;gap:9px;
@@ -96,6 +119,8 @@
 </style>
 </head>
 <body>
+
+<div class="fx-layer" id="fx"></div>
 
 <div class="machine">
   <div class="reels" id="reels"></div>
@@ -198,7 +223,49 @@ async function spin(){
     if (myToken !== spinToken) return;
     return spin();
   }
+
+  if (current.every(f => f === 'check')){
+    fireworks();
+  }
+
   lever.disabled = false;
+}
+
+/* พลุสีแดงพุ่งขึ้นจากขอบล่างจอ ตอนได้ติ๊กถูกครบ 3 อัน */
+const fx = document.getElementById('fx');
+const CONFETTI = ['#E0452F','#F0664A','#C8321E','#FF7F63','#FFC93C','#F6A9C4','#2AA36B','#3E9BDC','#FFFFFF'];
+function fireworks(){
+  burst(46, 0);
+  burst(38, 160);
+  burst(38, 320);
+}
+function burst(n, delayMs){
+  setTimeout(() => {
+    for (let i=0;i<n;i++){
+      const s = document.createElement('div');
+      s.className = 'spark';
+      const xPct = 4 + Math.random()*92;
+      const rise = 46 + Math.random()*42;
+      const drift = (Math.random()*2 - 1) * 130;
+      const burstX = (Math.random()*2 - 1) * 90;
+      const burstY = 50 + Math.random()*70;
+      const dur = 0.85 + Math.random()*0.65;
+      const delay = Math.random()*0.25;
+      s.style.setProperty('--x', xPct + 'vw');
+      s.style.setProperty('--rh', -rise + 'vh');
+      s.style.setProperty('--dx', drift + 'px');
+      s.style.setProperty('--bx', burstX + 'px');
+      s.style.setProperty('--bh', burstY + 'px');
+      s.style.setProperty('--dur', dur + 's');
+      s.style.setProperty('--c', CONFETTI[Math.floor(Math.random()*CONFETTI.length)]);
+      s.style.animationDelay = delay + 's';
+      const size = 5 + Math.random()*6;
+      s.style.width = size + 'px';
+      s.style.height = size + 'px';
+      fx.appendChild(s);
+      setTimeout(() => s.remove(), (dur + delay) * 1000 + 120);
+    }
+  }, delayMs);
 }
 
 /* กันแตะซ้ำ/หลายนิ้วพร้อมกัน และกันดับเบิลแท็บซูม */
